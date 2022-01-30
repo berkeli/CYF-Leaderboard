@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-loop-func */
 import axios from 'axios';
-import User from '../entities/user';
+import { UserModel as User } from '../entities/user';
 import { KataModel as Kata } from '../entities/kata';
 
 const fetchKataInfo = async (kataIds: string[]):Promise<any> => {
@@ -31,9 +31,11 @@ const fetchFromCodeWars = async (username:string) => {
 
   await fetchKataInfo(katasToFetch);
 
-  await User.findOneAndUpdate({ codewarsUsername: userData.codewarsUsername }, userData, { upsert: true }).exec();
+  const userId = await User.findOneAndUpdate({ codewarsUsername: userData.codewarsUsername }, userData, { upsert: true, new: true }).orFail(()=> Error('error'));
+  console.log(userId._id);
+  return userId._id;
 }
 
-export default async () => {
-  fetchFromCodeWars('BerkeliH')
+export default async (username:string) => {
+  fetchFromCodeWars(username)
 }

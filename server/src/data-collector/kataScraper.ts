@@ -2,7 +2,6 @@ import { UserModel as User } from './../entities/user';
 import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
 import mongoose from 'mongoose';
-import { AuthoredCollectionModel as AuthoredCollection} from '../entities/authoredCollection';
 
 async function autoScroll(page: puppeteer.Page) {
   await page.evaluate(async () => {
@@ -23,25 +22,25 @@ async function autoScroll(page: puppeteer.Page) {
   });
 }
 
-export default async (username:string):Promise<{_id: mongoose.Types.ObjectId, createdByName:string, name: string}[]> => {
-  const URL = `https://www.codewars.com/users/${username}/authored_collections`
+export default async (collectionID:string):Promise<{description: string | null, katas:object[]}> => {
+  const URL = `https://www.codewars.com/collections/${collectionID}`
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
   await page.goto(URL);
   await page.setViewport({ width: 1200,
     height: 800 });
 
-  await autoScroll(page);
+//   await autoScroll(page);
   const $ = cheerio.load(await page.content());
-  const elmSelector = '.list-item-collection'
-  const collections:{_id: mongoose.Types.ObjectId, createdByName:string, name: string}[] = []
-  let userId:string;
-  const userFromDB = await User.findOne({ codewarsUsername: username }).orFail(() => Error('Not found'));
-  userId = userFromDB._id;
-  console.log('userid', userId);
-  $(elmSelector).each((i, e) => {
-    collections.push({ _id: new mongoose.Types.ObjectId(e.attribs.id), createdByName: username, createdBy: userId, name: e.attribs['data-title'] });
-  })
+
+  const elmSelector = '.markdown.prose.max-w-none'
+  const description =  $(elmSelector).html(); 
+    const katas:mongoose.Types.ObjectId[] = []
+    $('.list-item-kata').each((i,e) =>{
+        katas.push(mongoose.Types.ObjectId(e.attribs.id));
+    } )
   await browser.close();
-  return collections
+  return {
+      description, katas
+  }
 };

@@ -1,43 +1,47 @@
-import { prop } from @typegoose/typegoose;
+import mongoose, { mongo } from 'mongoose';
+import { prop, getModelForClass, modelOptions, Ref, Severity } from '@typegoose/typegoose';
+import { Kata as KataClass } from './kata';
 
-class user {
-    @prop()
-    codewarsUsername: String;
-
-    @prop()
-    name?: String;
-
-@prop()
-  honor: number;
+@modelOptions({ schemaOptions: { _id: false } })
+class CompleteKataClass {
+  @prop({ ref: () => KataClass })
+    id: Ref<KataClass>;
 
   @prop()
-  clan:String;
-  @prop()
-  leaderboardPosition: Number;
+    completedAt: string;
 
-  @prop()
-  skills: String[]
-
-  @prop()
-  ranks: {
-    overall: {
-      rank: -4,
-      score: 1267
-    },
-    languages: {
-      javascript: {
-        rank: -4,
-        score: 975
-      },
-      python: {
-        rank: -5,
-        score: 304
-      }
-    }
-  },
-  codeChallenges: {
-    totalAuthored: 0,
-    totalCompleted: 126
-  }
+  @prop({ type: String, default: [] })
+    completedLanguages: mongoose.Types.Array<string>;
 }
+
+@modelOptions({ options: { allowMixed: Severity.ALLOW } })
+export class User {
+    @prop({ type: String, unique: true })
+      codewarsUsername: string;
+
+    @prop()
+      name?: string;
+
+    @prop()
+      honor: number;
+
+    @prop()
+      clan:string;
+
+    @prop()
+      leaderboardPosition: number;
+
+    @prop({ type: String, default: [] })
+      skills?: mongoose.Types.Array<string>;
+
+    @prop({ type: mongoose.Schema.Types.Mixed, default: {} })
+      ranks: object;
+
+    @prop()
+      totalCompleted: number;
+
+    @prop({ type: CompleteKataClass, default: [] })
+      completedKatas: mongoose.Types.Array<CompleteKataClass>
 }
+
+export const UserModel = getModelForClass(User);

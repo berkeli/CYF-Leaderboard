@@ -1,3 +1,4 @@
+import { UserModel as User } from './../entities/user';
 import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
 import mongoose from 'mongoose';
@@ -5,6 +6,8 @@ import mongoose from 'mongoose';
 const URL = 'https://www.codewars.com/users/CodeYourFuture/authored_collections';
 
 const isTagElement = (element: any): element is cheerio.TagElement => element?.attribs !== undefined;
+
+import { AuthoredCollectionModel as AuthoredCollection} from '../entities/authoredCollection';
 
 async function autoScroll(page: puppeteer.Page) {
   await page.evaluate(async () => {
@@ -25,7 +28,8 @@ async function autoScroll(page: puppeteer.Page) {
   });
 }
 
-export default async ():Promise<{_id: mongoose.Types.ObjectId, name: string}[]> => {
+export default async (username:string):Promise<{_id: mongoose.Types.ObjectId, createdByName:string, name: string}[]> => {
+  const URL = `https://www.codewars.com/users/${username}/authored_collections`
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
   await page.goto(URL);
@@ -35,12 +39,21 @@ export default async ():Promise<{_id: mongoose.Types.ObjectId, name: string}[]> 
   await autoScroll(page);
   const $ = cheerio.load(await page.content());
   const elmSelector = '.list-item-collection'
+
   const collectionIds:{_id: mongoose.Types.ObjectId, name: string}[] = []
   $(elmSelector).each((_i, e: cheerio.Element) => {
     if (isTagElement(e)) {
       collectionIds.push({ _id: new mongoose.Types.ObjectId(e.attribs.id), name: e.attribs['data-title'] });
     }
+
+  const collections:{_id: mongoose.Types.ObjectId, createdByName:string, name: string}[] = []
+  let userId:string;
+  const userFromDB = await User.findOne({ codewarsUsername: username }).orFail(() => Error('Not found'));
+  userId = userFromDB._id;
+  console.log('userid', userId);
+  $(elmSelector).each((i, e) => {
+    collections.push({ _id: new mongoose.Types.ObjectId(e.attribs.id), createdByName: username, createdBy: userId, name: e.attribs['data-title'] });
   })
   await browser.close();
-  return collectionIds
+  return collections
 };

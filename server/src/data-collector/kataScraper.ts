@@ -1,46 +1,34 @@
-import { UserModel as User } from './../entities/user';
 import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
 import mongoose from 'mongoose';
+import { Ref } from '@typegoose/typegoose';
+import { AuthoredCollection, AuthoredCollectionModel as AuthCollection } from '../entities/authoredCollection';
+import { fetchKataInfo } from '.';
+import { Kata } from '../entities/kata';
+import { isTagElement } from './utils';
 
-async function autoScroll(page: puppeteer.Page) {
-  await page.evaluate(async () => {
-    await new Promise((resolve) => {
-      let totalHeight = 0;
-      const distance = 100;
-      const timer = setInterval(() => {
-        const { scrollHeight } = document.body;
-        window.scrollBy(0, distance);
-        totalHeight += distance;
-
-        if (totalHeight >= scrollHeight) {
-          clearInterval(timer);
-          resolve();
-        }
-      }, 100);
-    });
-  });
-}
-
-export default async (collectionID:string):Promise<{description: string | null, katas:object[]}> => {
-  const URL = `https://www.codewars.com/collections/${collectionID}`
+export default async (collection: AuthoredCollection):Promise<void> => {
+  const URL = `https://www.codewars.com/collections/${collection._id.toString()}`;
+  console.log(`Scraping: ${collection.name}`);
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
   await page.goto(URL);
   await page.setViewport({ width: 1200,
     height: 800 });
 
-//   await autoScroll(page);
   const $ = cheerio.load(await page.content());
 
   const elmSelector = '.markdown.prose.max-w-none'
-  const description =  $(elmSelector).html(); 
-    const katas:mongoose.Types.ObjectId[] = []
-    $('.list-item-kata').each((i,e) =>{
-        katas.push(mongoose.Types.ObjectId(e.attribs.id));
-    } )
+  const description = $(elmSelector).html();
+  const katas:Ref<Kata>[] = []
+  const katasToFetch: string[] = [];
+  $('.list-item-kata').each((_i, e:cheerio.Element) => {
+    if (isTagElement(e)) {
+      katas.push(new mongoose.Types.ObjectId(e.attribs.id));
+      katasToFetch.push(e.attribs.id);
+    }
+  })
   await browser.close();
-  return {
-      description, katas
-  }
+  fetchKataInfo(katasToFetch);
+  await AuthCollection.findOneAndUpdate({ _id: collection._id }, { ...collection, description, katas }, { upsert: true });
 };

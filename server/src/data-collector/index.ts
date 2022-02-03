@@ -1,12 +1,12 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-loop-func */
-import mongoose from 'mongoose';
 import axios from 'axios';
 import { UserModel as User, CompleteKataClass } from '../entities/user';
-import { KataModel as Kata } from '../entities/kata';
+import { KataModel as Kata, Kata as KataClass } from '../entities/kata';
 
-const fetchKataInfo = async (kataIds: string[]):Promise<any> => {
-  const existingKatas: string[] = await Kata.find({ id: { $in: kataIds } }).map((e: mongoose.Types.ObjectId) => e._id.toString);
+export const fetchKataInfo = async (kataIds: string[]):Promise<any> => {
+  const existingKatasDB: KataClass[] = await Kata.find({ id: { $in: kataIds } }).select('_id');
+  const existingKatas: string[] = existingKatasDB.map((e:KataClass) => e._id.toString());
   kataIds.filter((e) => !existingKatas.includes(e)).forEach(async (e) => {
     let getKata = await axios(`https://www.codewars.com/api/v1/code-challenges/${e}`);
     getKata = { ...getKata.data, _id: getKata.data.id };
@@ -31,7 +31,7 @@ const fetchFromCodeWars = async (username:string) => {
 
   await fetchKataInfo(katasToFetch);
 
-  const userId = await User.findOneAndUpdate({ codewarsUsername: userData.codewarsUsername }, userData, { upsert: true, new: true }).orFail(()=> Error('error'));
+  const userId = await User.findOneAndUpdate({ codewarsUsername: userData.codewarsUsername }, userData, { upsert: true, new: true }).orFail(() => Error('error'));
   console.log(userId._id);
   return userId._id;
 }

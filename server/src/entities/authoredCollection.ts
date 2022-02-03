@@ -4,8 +4,11 @@ import { User } from './user';
 import { Kata } from './kata';
 
 export class AuthoredCollection {
+    @prop()
+      _id: mongoose.Types.ObjectId
+
     @prop({ ref: () => User })
-      createdBy: Ref<User>
+      createdBy?: Ref<User>
 
     @prop()
       createdByName: string
@@ -14,7 +17,13 @@ export class AuthoredCollection {
       name: string;
 
     @prop()
-      katas?: mongoose.Types.Array<Kata>
+      description?: string | null;
+
+    @prop()
+      order?: number;
+
+    @prop({ ref: () => Kata })
+      katas?: Ref<Kata>[]
 }
 
 export const AuthoredCollectionModel = getModelForClass(AuthoredCollection);

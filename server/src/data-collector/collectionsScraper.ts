@@ -1,32 +1,10 @@
-import { UserModel as User } from './../entities/user';
 import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
 import mongoose from 'mongoose';
-
-const URL = 'https://www.codewars.com/users/CodeYourFuture/authored_collections';
-
-const isTagElement = (element: any): element is cheerio.TagElement => element?.attribs !== undefined;
-
-import { AuthoredCollectionModel as AuthoredCollection} from '../entities/authoredCollection';
-
-async function autoScroll(page: puppeteer.Page) {
-  await page.evaluate(async () => {
-    await new Promise((resolve) => {
-      let totalHeight = 0;
-      const distance = 100;
-      const timer = setInterval(() => {
-        const { scrollHeight } = document.body;
-        window.scrollBy(0, distance);
-        totalHeight += distance;
-
-        if (totalHeight >= scrollHeight) {
-          clearInterval(timer);
-          resolve(null);
-        }
-      }, 100);
-    });
-  });
-}
+import { UserModel as User } from '../entities/user';
+import { AuthoredCollection } from '../entities/authoredCollection';
+import { autoScroll, isTagElement } from './utils';
+import dataCollector from '.';
 
 export default async (username:string):Promise<{_id: mongoose.Types.ObjectId, createdByName:string, name: string}[]> => {
   const URL = `https://www.codewars.com/users/${username}/authored_collections`
@@ -40,20 +18,22 @@ export default async (username:string):Promise<{_id: mongoose.Types.ObjectId, cr
   const $ = cheerio.load(await page.content());
   const elmSelector = '.list-item-collection'
 
-  const collectionIds:{_id: mongoose.Types.ObjectId, name: string}[] = []
+  const collections:AuthoredCollection[] = []
+  let userFromDB = await User.findOne({ codewarsUsername: username }).exec();
+
+  // Pull user information if it doesn't exist in DB
+  if (!userFromDB) {
+    await dataCollector(username);
+    userFromDB = await User.findOne({ codewarsUsername: username }).exec();
+  }
+
+  const userId = new mongoose.Types.ObjectId(userFromDB?._id);
   $(elmSelector).each((_i, e: cheerio.Element) => {
     if (isTagElement(e)) {
-      collectionIds.push({ _id: new mongoose.Types.ObjectId(e.attribs.id), name: e.attribs['data-title'] });
+      collections.push({ _id: new mongoose.Types.ObjectId(e.attribs.id), name: e.attribs['data-title'], createdByName: username, createdBy: userId });
     }
-
-  const collections:{_id: mongoose.Types.ObjectId, createdByName:string, name: string}[] = []
-  let userId:string;
-  const userFromDB = await User.findOne({ codewarsUsername: username }).orFail(() => Error('Not found'));
-  userId = userFromDB._id;
-  console.log('userid', userId);
-  $(elmSelector).each((i, e) => {
-    collections.push({ _id: new mongoose.Types.ObjectId(e.attribs.id), createdByName: username, createdBy: userId, name: e.attribs['data-title'] });
   })
+
   await browser.close();
   return collections
 };

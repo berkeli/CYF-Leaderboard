@@ -1,26 +1,8 @@
 import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
+import { autoScroll } from './utils';
 
 const URL = 'https://www.codewars.com/users/CodeYourFuture/following'
-
-async function autoScroll(page: puppeteer.Page) {
-  await page.evaluate(async () => {
-    await new Promise((resolve) => {
-      let totalHeight = 0;
-      const distance = 100;
-      const timer = setInterval(() => {
-        const { scrollHeight } = document.body;
-        window.scrollBy(0, distance);
-        totalHeight += distance;
-
-        if (totalHeight >= scrollHeight) {
-          clearInterval(timer);
-          resolve(null);
-        }
-      }, 100);
-    });
-  });
-}
 
 export default async ():Promise<string[]> => {
   const browser = await puppeteer.launch({ headless: true });

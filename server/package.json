@@ -5,11 +5,13 @@
   "license": "MIT",
   "dependencies": {
     "@typegoose/typegoose": "^9.5.0",
+    "@types/node-cron": "^3.0.1",
     "axios": "^0.25.0",
     "cheerio": "^1.0.0-rc.10",
     "dotenv": "^14.3.2",
     "express": "^4.17.2",
     "mongoose": "^6.1.8",
+    "node-cron": "^3.0.0",
     "puppeteer": "^13.1.2",
     "typegoose": "^5.9.1"
   },

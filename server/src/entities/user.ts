@@ -1,9 +1,9 @@
-import mongoose, { mongo } from 'mongoose';
+import mongoose from 'mongoose';
 import { prop, getModelForClass, modelOptions, Ref, Severity } from '@typegoose/typegoose';
 import { Kata as KataClass } from './kata';
 
 @modelOptions({ schemaOptions: { _id: false } })
-class CompleteKataClass {
+export class CompleteKataClass {
   @prop({ ref: () => KataClass })
     id: Ref<KataClass>;
 

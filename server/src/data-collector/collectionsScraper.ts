@@ -2,7 +2,9 @@ import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
 import mongoose from 'mongoose';
 
-const URL = 'https://www.codewars.com/users/CodeYourFuture/authored_collections'
+const URL = 'https://www.codewars.com/users/CodeYourFuture/authored_collections';
+
+const isTagElement = (element: any): element is cheerio.TagElement => element?.attribs !== undefined;
 
 async function autoScroll(page: puppeteer.Page) {
   await page.evaluate(async () => {
@@ -16,7 +18,7 @@ async function autoScroll(page: puppeteer.Page) {
 
         if (totalHeight >= scrollHeight) {
           clearInterval(timer);
-          resolve();
+          resolve(null);
         }
       }, 100);
     });
@@ -34,8 +36,10 @@ export default async ():Promise<{_id: mongoose.Types.ObjectId, name: string}[]> 
   const $ = cheerio.load(await page.content());
   const elmSelector = '.list-item-collection'
   const collectionIds:{_id: mongoose.Types.ObjectId, name: string}[] = []
-  $(elmSelector).each((i, e) => {
-    collectionIds.push({ _id: new mongoose.Types.ObjectId(e.attribs.id), name: e.attribs['data-title'] });
+  $(elmSelector).each((_i, e: cheerio.Element) => {
+    if (isTagElement(e)) {
+      collectionIds.push({ _id: new mongoose.Types.ObjectId(e.attribs.id), name: e.attribs['data-title'] });
+    }
   })
   await browser.close();
   return collectionIds

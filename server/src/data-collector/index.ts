@@ -1,12 +1,12 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-loop-func */
+import mongoose from 'mongoose';
 import axios from 'axios';
-import User from '../entities/user';
+import { UserModel as User, CompleteKataClass } from '../entities/user';
 import { KataModel as Kata } from '../entities/kata';
 
 const fetchKataInfo = async (kataIds: string[]):Promise<any> => {
-  let existingKatas = await Kata.find({ id: { $in: kataIds } });
-  existingKatas = existingKatas.map((e) => e._id.toString)
+  const existingKatas: string[] = await Kata.find({ id: { $in: kataIds } }).map((e: mongoose.Types.ObjectId) => e._id.toString);
   kataIds.filter((e) => !existingKatas.includes(e)).forEach(async (e) => {
     let getKata = await axios(`https://www.codewars.com/api/v1/code-challenges/${e}`);
     getKata = { ...getKata.data, _id: getKata.data.id };
@@ -27,7 +27,7 @@ const fetchFromCodeWars = async (username:string) => {
     currentPage++;
   } while (totalPages > currentPage)
 
-  const katasToFetch = userData.completedKatas.map((e) => e.id);
+  const katasToFetch = userData.completedKatas.map((e: CompleteKataClass) => e.id);
 
   await fetchKataInfo(katasToFetch);
 

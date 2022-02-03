@@ -15,7 +15,7 @@ async function autoScroll(page: puppeteer.Page) {
 
         if (totalHeight >= scrollHeight) {
           clearInterval(timer);
-          resolve();
+          resolve(null);
         }
       }, 100);
     });
@@ -33,7 +33,7 @@ export default async ():Promise<string[]> => {
   const $ = cheerio.load(await page.content());
   const elmSelector = 'table > tbody > tr'
   const usernames:string[] = []
-  $(elmSelector).each((i, e) => {
+  $(elmSelector).each((_i, e) => {
     usernames.push($(e).data().username)
   })
   await browser.close();

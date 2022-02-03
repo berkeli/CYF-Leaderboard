@@ -3,8 +3,8 @@ import dataCollector from './data-collector';
 import collectionsScraper from './data-collector/collectionsScraper';
 import scraper from './data-collector/scraper';
 import connect from './utils/connect';
-const app = express();
 
+const app = express();
 
 const main = async () => {
   app.listen(4000, () => {

@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer';
-import { autoScroll } from './utils';
+import { autoScroll, isTagElement } from './utils';
 
 export default async (username: string):Promise<string[]> => {
   const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
@@ -14,7 +14,9 @@ export default async (username: string):Promise<string[]> => {
   const elmSelector = 'table > tbody > tr'
   const usernames:string[] = []
   $(elmSelector).each((_i, e) => {
-    usernames.push($(e).data().username)
+    if (isTagElement(e)) {
+      usernames.push(encodeURI(e.attribs['data-username']))
+    }
   })
   await browser.close();
   return usernames

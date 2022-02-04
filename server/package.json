@@ -32,6 +32,7 @@
   },
   "scripts": {
     "watch": "tsc -w",
+    "postinstall": "tsc",
     "dev": "nodemon dist/index.js --trace-warnings --unhandled-rejections=strict",
     "start": "node dist/index.js"
   }

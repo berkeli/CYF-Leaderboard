@@ -1,6 +1,7 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-await-in-loop */
 import express from 'express';
 import cron from 'node-cron';
-import { AuthoredCollection } from './entities/authoredCollection';
 import collectionsScraper from './data-collector/collectionsScraper';
 import kataScraper from './data-collector/kataScraper';
 import connect from './utils/connect';
@@ -10,9 +11,9 @@ const app = express();
 const updateData = async () => {
   const getCollections = await collectionsScraper('CodeYourFuture');
 
-  getCollections.forEach(async (collection:AuthoredCollection) => {
-    await kataScraper(collection);
-  })
+  for (const coll of getCollections) {
+    await kataScraper(coll);
+  }
 }
 
 cron.schedule('0 0 0 * * *', () => {

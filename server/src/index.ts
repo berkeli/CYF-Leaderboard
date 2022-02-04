@@ -22,8 +22,8 @@ cron.schedule('0 0 0 * * *', () => {
 })
 
 const main = async () => {
-  app.listen(4000, () => {
-    console.log('server started on http://localhost:4000');
+  app.listen(process.env.PORT, () => {
+    console.log(`Server started on Port ${process.env.PORT}`);
   });
   await connect();
   updateData();

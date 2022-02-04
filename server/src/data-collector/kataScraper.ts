@@ -10,7 +10,7 @@ import { isTagElement } from './utils';
 export default async (collection: AuthoredCollection):Promise<void> => {
   const URL = `https://www.codewars.com/collections/${collection._id.toString()}`;
   console.log(`Scraping: ${collection.name}`);
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
   const page = await browser.newPage();
   await page.goto(URL);
   await page.setViewport({ width: 1200,

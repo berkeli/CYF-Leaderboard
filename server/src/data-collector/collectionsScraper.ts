@@ -8,7 +8,7 @@ import dataCollector from '.';
 
 export default async (username:string):Promise<{_id: mongoose.Types.ObjectId, createdByName:string, name: string}[]> => {
   const URL = `https://www.codewars.com/users/${username}/authored_collections`
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
   const page = await browser.newPage();
   await page.goto(URL);
   await page.setViewport({ width: 1200,

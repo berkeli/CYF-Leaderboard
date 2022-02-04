@@ -2,7 +2,9 @@
 /* eslint-disable no-await-in-loop */
 import express from 'express';
 import cron from 'node-cron';
+import dataCollector from './data-collector';
 import collectionsScraper from './data-collector/collectionsScraper';
+import scraper from './data-collector/scraper';
 import kataScraper from './data-collector/kataScraper';
 import connect from './utils/connect';
 
@@ -13,6 +15,11 @@ const updateData = async () => {
 
   for (const coll of getCollections) {
     await kataScraper(coll);
+  }
+  const getUsers = await scraper('CodeYourFuture');
+
+  for (const user of getUsers) {
+    await dataCollector(user);
   }
 }
 

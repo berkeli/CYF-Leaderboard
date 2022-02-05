@@ -2,7 +2,7 @@
 /* eslint-disable no-loop-func */
 import axios from 'axios';
 import { KataModel as Kata, Kata as KataClass } from '../entities/kata';
-import { CompleteKataClass } from '../entities/user';
+import { CompleteKataClass, User as UserClass, UserModel as User } from '../entities/user';
 
 export const fetchKataInfo = async (kataIds: string[]):Promise<object[]> => {
   const existingKatasDB: KataClass[] = await Kata.find({ id: { $in: kataIds } }).select('_id');
@@ -23,7 +23,7 @@ export const fetchKataInfo = async (kataIds: string[]):Promise<object[]> => {
   return bulkWriteRequest;
 };
 
-export default async (username:string):Promise<object> => {
+export default async (username:string):Promise<UserClass> => {
   const userReq = await axios(`https://www.codewars.com/api/v1/users/${username}`);
   const userData = { ...userReq.data, codewarsUsername: userReq.data.username };
   userData.completedKatas = [];
@@ -43,8 +43,6 @@ export default async (username:string):Promise<object> => {
   } catch (e) {
     console.log(e);
   }
-
-  return { updateOne: { filter: { codewarsUsername: userData.codewarsUsername },
-    update: userData,
-    upsert: true } };
+  const result = await User.findOneAndUpdate({ codewarsUsername: userData.codewarsUsername }, userData, { new: true, upsert: true });
+  return result
 }

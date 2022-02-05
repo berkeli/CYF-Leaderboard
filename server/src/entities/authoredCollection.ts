@@ -1,14 +1,14 @@
 import mongoose from 'mongoose';
 import { prop, getModelForClass, Ref } from '@typegoose/typegoose';
-import { User } from './user';
+import { User as UserClass } from './user';
 import { Kata } from './kata';
 
 export class AuthoredCollection {
     @prop()
       _id: mongoose.Types.ObjectId
 
-    @prop({ ref: () => User })
-      createdBy?: Ref<User>
+    @prop({ ref: 'User' })
+      createdBy?: Ref<UserClass>
 
     @prop()
       createdByName: string

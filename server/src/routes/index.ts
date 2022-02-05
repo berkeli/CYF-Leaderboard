@@ -7,7 +7,7 @@ routes.get('/', (_req, res) => {
   res.status(200).json({ message: 'Connected!' });
 });
 routes.get('/users', async (_req, res) => {
-  const users = await User.find().populate({ path: 'completedKatas', populate: { path: 'id', model: 'Kata' } });
+  const users = await User.find();
   res.status(200).json({ data: users });
 });
 export default routes;

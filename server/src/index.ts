@@ -21,5 +21,6 @@ const main = async () => {
     console.log(`Server started on Port ${process.env.PORT}`);
   });
   await connect();
+  updateData();
 }
 main();

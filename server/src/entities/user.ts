@@ -7,6 +7,8 @@ import getMonday from '../utils/getMonday';
 import { AuthoredCollection, AuthoredCollectionModel as AuthColl } from './authoredCollection';
 
 @modelOptions({ schemaOptions: { _id: false } })
+
+@modelOptions({ schemaOptions: { _id: false } })
 export class CompleteKataClass {
   @prop({ ref: () => KataClass })
     id: Ref<KataClass> | KataClass;
@@ -21,36 +23,9 @@ export class CompleteKataClass {
 class weeklyProgressClass {
   date: string;
 
-  @prop()
-    '-8'?: number;
-
-  @prop()
-    '-7'?: number;
-
-  @prop()
-    '-6'?: number;
-
-  @prop()
-    '-5'?: number;
-
-  @prop()
-    '-4'?: number;
-
-  @prop()
-    '-3'?: number;
-
-  @prop()
-    '-2'?: number;
-
-  @prop()
-    '-1'?: number;
-
-  @prop()
-    '1'?: number;
-
-  @prop()
-    '2'?: number;
+  [key: string]: any;
 }
+
 @modelOptions({ schemaOptions: { _id: false } })
 class collectionProgressClass {
   @prop({ ref: 'AuthoredCollection' })
@@ -63,6 +38,10 @@ class collectionProgressClass {
     total?: number
 }
 
+function isKata(kata: KataClass | undefined | mongoose.Types.ObjectId):kata is KataClass {
+  return (kata as KataClass)?.rank !== undefined;
+}
+
 @post<User>('findOneAndUpdate', async function (this: any) {
   const filter = this.getFilter();
   const userData = await UserModel.findOne(filter).populate({ path: 'completedKatas', populate: { path: 'id', model: 'Kata' } });
@@ -70,15 +49,16 @@ class collectionProgressClass {
   // Calculate Weekly Progress
 
   const weeklyProgress:weeklyProgressClass[] = []
-  userData?.completedKatas.forEach(({ id: kata, completedAt }) => {
+  userData?.completedKatas.forEach(({ id: kata, completedAt } : { id: mongoose.Types.ObjectId | KataClass | undefined; completedAt: string; }) => {
+    if (!isKata(kata)) return;
     const week = getMonday(Date.parse(completedAt));
     const findWeek:weeklyProgressClass | undefined = weeklyProgress.find((e:weeklyProgressClass) => e.date === week)
     if (!findWeek) {
-      weeklyProgress.unshift({ date: week, [kata.rank.id]: 1 })
+      weeklyProgress.unshift({ date: week, [kata?.rank.id as keyof weeklyProgressClass]: 1 })
     } else if (!findWeek[kata.rank.id]) {
       findWeek[kata.rank.id] = 1
-    } else {
-      findWeek[kata.rank.id]++
+    } else if (typeof findWeek[kata.rank.id] === 'number') {
+      findWeek[kata?.rank.id]++;
     }
   })
   userData.weeklyProgress = weeklyProgress;

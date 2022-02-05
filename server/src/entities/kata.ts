@@ -28,7 +28,11 @@ export class Kata {
     languages: mongoose.Types.Array<string>
 
   @prop({ type: mongoose.Schema.Types.Mixed, default: {} })
-    rank: object
+    rank: {
+      id: number,
+      name: string,
+      color: string,
+    }
 
   @prop()
     publishedAt: string

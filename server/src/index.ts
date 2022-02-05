@@ -7,6 +7,7 @@ import collectionsScraper from './data-collector/collectionsScraper';
 import scraper from './data-collector/scraper';
 import kataScraper from './data-collector/kataScraper';
 import connect from './utils/connect';
+import { UserModel as User } from './entities/user';
 
 const app = express();
 
@@ -18,8 +19,12 @@ const updateData = async () => {
   }
   const getUsers = await scraper('CodeYourFuture');
 
-  for (const user of getUsers) {
-    await dataCollector(user);
+  const bulkWriteDoc = await Promise.all(getUsers.map(async (e) => dataCollector(e)));
+
+  try {
+    User.bulkWrite(bulkWriteDoc, { ordered: false });
+  } catch (e) {
+    console.log(e);
   }
 }
 

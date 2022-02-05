@@ -1,20 +1,29 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-loop-func */
 import axios from 'axios';
-import { UserModel as User, CompleteKataClass } from '../entities/user';
 import { KataModel as Kata, Kata as KataClass } from '../entities/kata';
+import { CompleteKataClass } from '../entities/user';
 
-export const fetchKataInfo = async (kataIds: string[]):Promise<any> => {
+export const fetchKataInfo = async (kataIds: string[]):Promise<object[]> => {
   const existingKatasDB: KataClass[] = await Kata.find({ id: { $in: kataIds } }).select('_id');
   const existingKatas: string[] = existingKatasDB.map((e:KataClass) => e._id.toString());
+  const bulkWriteRequest:object[] = [];
   kataIds.filter((e) => !existingKatas.includes(e)).forEach(async (e) => {
-    let getKata = await axios(`https://www.codewars.com/api/v1/code-challenges/${e}`);
-    getKata = { ...getKata.data, _id: getKata.data.id };
-    await Kata.findOneAndUpdate({ _id: e }, getKata, { upsert: true }).exec();
+    axios(`https://www.codewars.com/api/v1/code-challenges/${e}`).then((res) => {
+      const getKata = { ...res.data, _id: res.data.id };
+      if (res.data) {
+        bulkWriteRequest.push({ updateOne: { filter: { _id: getKata._id },
+          update: getKata,
+          upsert: true } })
+      }
+    }).catch((error) => {
+      console.log('Error', error.toJSON());
+    });
   });
+  return bulkWriteRequest;
 };
 
-const fetchFromCodeWars = async (username:string) => {
+export default async (username:string):Promise<object> => {
   const userReq = await axios(`https://www.codewars.com/api/v1/users/${username}`);
   const userData = { ...userReq.data, codewarsUsername: userReq.data.username };
   userData.completedKatas = [];
@@ -29,13 +38,13 @@ const fetchFromCodeWars = async (username:string) => {
 
   const katasToFetch = userData.completedKatas.map((e: CompleteKataClass) => e.id);
 
-  await fetchKataInfo(katasToFetch);
+  try {
+    Kata.bulkWrite(await fetchKataInfo(katasToFetch), { ordered: false });
+  } catch (e) {
+    console.log(e);
+  }
 
-  const userId = await User.findOneAndUpdate({ codewarsUsername: userData.codewarsUsername }, userData, { upsert: true, new: true }).orFail(() => Error('error'));
-  console.log(userId._id);
-  return userId._id;
-}
-
-export default async (username:string) => {
-  fetchFromCodeWars(username)
+  return { updateOne: { filter: { codewarsUsername: userData.codewarsUsername },
+    update: userData,
+    upsert: true } };
 }

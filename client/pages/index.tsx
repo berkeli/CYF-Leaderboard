@@ -1,11 +1,20 @@
+import { Box, Center } from '@chakra-ui/react'
 import type { NextPage } from 'next'
-import styles from '../styles/Home.module.css'
+
+import Background from './components/Background'
+import Navigation from './components/Navigation'
+import UserTable from './components/_UserTable'
 
 const Home: NextPage = () => {
-  return (
-    <div className={styles.container}>
-
-    </div>
+   return (
+     <Box>
+       <Navigation/>
+       <Background />
+       <Box px={'5rem'} minH={'100vh'} pt={'3rem'}>
+         <UserTable/>
+       </Box>
+       
+     </Box>
   )
 }
 

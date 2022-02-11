@@ -3,7 +3,7 @@ import type { NextPage } from 'next'
 
 import Background from './components/Background'
 import Navigation from './components/Navigation'
-import UserTable from './components/_UserTable'
+import UserTable from './components/UserTable'
 
 const Home: NextPage = () => {
    return (

@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react'
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { AuthoredCollection } from '../../entities';
 import { UserClass } from '../../entities/user';
 import { spinnerJSX } from '../common/utils';
 import config from '../config';
@@ -23,7 +24,7 @@ interface UserTableState {
     loading: boolean,
     hasMore: boolean,
     expanded: string,
-    authCollections: object[]
+    authCollections: AuthoredCollection[]
 }
 
 export default function UserTable() {

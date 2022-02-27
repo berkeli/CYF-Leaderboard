@@ -1,8 +1,9 @@
 import { Box, Center, Heading, Table, Tbody, Td, Tfoot, Th, Thead, Tr, VStack, Wrap, WrapItem } from "@chakra-ui/react";
-import { UserClass } from "../../entities";
+import { UserClass, AuthoredCollection } from "../../entities/";
 import AuthCollectionsTable from "./AuthCollectionsTable";
+import UserKatasTable from "./UserKatasTable";
 
-export default function UserInfo({user, collections} : {user:UserClass, collections:object[]}) {
+export default function UserInfo({user, collections} : {user:UserClass, collections:AuthoredCollection[]}) {
   
   return (
     <Tr>
@@ -15,9 +16,10 @@ export default function UserInfo({user, collections} : {user:UserClass, collecti
                     </VStack>                    
                 </WrapItem>
                 <WrapItem w={{base: '100%', lg: '45%'}}>
-                    <Center w='100%'>
+                    <VStack w='100%'>
                         <Heading as='h3' size='md'>Latest Katas:</Heading>
-                    </Center> 
+                        <UserKatasTable completedKatas = {user.completedKatas.filter(e=> e.id).slice(0, collections.length + 1)} />
+                    </VStack> 
                 </WrapItem>
             </Wrap>
         </Td>

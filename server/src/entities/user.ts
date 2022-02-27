@@ -36,6 +36,9 @@ class collectionProgressClass {
 
   @prop()
     total?: number
+
+  @prop()
+    dateComplete?: string
 }
 
 function isKata(kata: KataClass | undefined | mongoose.Types.ObjectId):kata is KataClass {
@@ -49,7 +52,7 @@ function isKata(kata: KataClass | undefined | mongoose.Types.ObjectId):kata is K
   // Calculate Weekly Progress
 
   const weeklyProgress:weeklyProgressClass[] = []
-  userData?.completedKatas.forEach(({ id: kata, completedAt } : { id: mongoose.Types.ObjectId | KataClass | undefined; completedAt: string; }) => {
+  userData.completedKatas.forEach(({ id: kata, completedAt } : { id: mongoose.Types.ObjectId | KataClass | undefined; completedAt: string; }) => {
     if (!isKata(kata)) return;
     const week = getMonday(Date.parse(completedAt));
     const findWeek:weeklyProgressClass | undefined = weeklyProgress.find((e:weeklyProgressClass) => e.date === week)
@@ -66,16 +69,30 @@ function isKata(kata: KataClass | undefined | mongoose.Types.ObjectId):kata is K
   // Calculate Collection progress
   const collections = await AuthColl.find({ createdByName: userData.clan }).sort('order').exec();
   const collectionProgress:collectionProgressClass[] = [];
-  const listComplete = userData.completedKatas.map((e) => e.id?._id.toString())
+  const listComplete: {[key:string]: string} = {};
+  userData.completedKatas.forEach((e:CompleteKataClass) => {
+    if (!e?.id?._id) return;
+    listComplete[e.id._id.toString()] = e.completedAt
+  })
   collections.forEach(({ _id, katas }) => {
+    if (!katas) return;
     let completed = 0;
-    katas?.forEach((kata) => {
-      completed += listComplete.includes(kata?._id.toString()) ? 1 : 0
+    let latestComplete = 0;
+    katas.forEach((kata) => {
+      if (kata && listComplete[kata.toString()]) {
+        completed++;
+        latestComplete = Math.max(Date.parse(listComplete[kata.toString()]), latestComplete);
+      }
     })
-    collectionProgress.push({ id: _id, completed, total: katas?.length })
+    let dateComplete;
+    if (completed === katas?.length) {
+      dateComplete = new Date(latestComplete);
+    }
+    delete userData.__v
+    collectionProgress.push({ id: _id, completed, total: katas?.length, dateComplete: dateComplete?.toString() })
   })
   userData.collectionProgress = collectionProgress;
-  userData.save();
+  await userData.save();
 })
 @modelOptions({ options: { allowMixed: Severity.ALLOW } })
 export class User {
@@ -103,8 +120,8 @@ export class User {
     @prop()
       totalCompleted: number;
 
-    @prop()
-      collectionProgress?: object[];
+    @prop({ type: collectionProgressClass, default: [] })
+      collectionProgress?: collectionProgressClass[];
 
     @prop()
       weeklyProgress?: weeklyProgressClass[];

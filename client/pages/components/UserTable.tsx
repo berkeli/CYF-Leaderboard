@@ -4,19 +4,14 @@ import {
     Table,
     Thead,
     Tbody,
-    Tfoot,
     Tr,
     Th,
     Td,
-    TableCaption,
     useColorModeValue,
-    Spinner,
-    Center,
-    usePrefersReducedMotion
 } from '@chakra-ui/react'
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { UserClass } from '../../entities';
+import { UserClass } from '../../entities/user';
 import { spinnerJSX } from '../common/utils';
 import config from '../config';
 import UserInfo from '../UserInfo';

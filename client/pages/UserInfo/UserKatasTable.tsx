@@ -1,46 +1,36 @@
 import { Table, Tbody, Td, Tfoot, Thead, Tr } from '@chakra-ui/react'
+import dayjs from 'dayjs';
 import React from 'react'
+import { completedKatas } from '../../entities/';
+import { FaJava } from 'react-icons/fa';
+import iconPicker from '../components/icons';
 
 interface IAuthCollectionsTable {
-    collectionProgress: object[],
-    collections: object[]
+    completedKatas: completedKatas[],
 }
 
-export default function AuthCollectionsTable({ userKatas } : IAuthCollectionsTable) {
-    const collById:{[key:string] : any} = {};
-    collections.forEach(e => {
-        collById[e._id] = e
-    })
-    const totalComplete = collectionProgress.reduce((a:number, cv:object) => a + cv.completed,0)
-    const total = collectionProgress.reduce((a:number, cv:object) => a + cv.total,0)
+export default function UserKatasTable({ completedKatas } : IAuthCollectionsTable) {
+    console.log(completedKatas)
     return (
         <Table w='100%' size='sm' variant='simple'>
             <Thead>
                 <Tr>
                     <Td>Kata Name</Td>
                     <Td>Rank</Td>
-                    <Td>Language</Td>
+                    <Td>Languages</Td>
                     <Td>Complete Date</Td>
                 </Tr>
             </Thead>
             <Tbody>
-                {collectionProgress.map(el => (
-                    <Tr key={el.id}>
-                        <Td>{collById[el.id].name}</Td>
-                        <Td>{el.completed}/{el.total}</Td>
-                        <Td>{Math.round(el.completed / el.total * 10000) / 100}%</Td>
-                        <Td></Td>
+                {completedKatas.map(el => (
+                    <Tr key={el.id._id}>
+                        <Td>{el.id.name}</Td>
+                        <Td><span className=''>{el.id.rank.name}</span></Td>
+                        <Td>{el.completedLanguages.map(e => iconPicker(e))}</Td>
+                        <Td>{dayjs(el.completedAt).format('DD MMM YYYY')}</Td>
                     </Tr>
                 ))}
             </Tbody>
-            <Tfoot>
-                <Tr>
-                    <Td></Td>
-                    <Td>{totalComplete}/{total}</Td>
-                    <Td>{Math.round(totalComplete / total * 10000) / 100}%</Td>
-                    <Td></Td>
-                </Tr>
-            </Tfoot>
         </Table>
     )
 }

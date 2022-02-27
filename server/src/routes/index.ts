@@ -8,7 +8,7 @@ routes.get('/', (_req, res) => {
   res.status(200).json({ message: 'Connected!' });
 });
 routes.get('/users', async (_req, res) => {
-  const users = await User.find().populate({ path: 'completedKatas', populate: { path: 'id' }}).sort({ honor: -1 });
+  const users = await User.find().populate({ path: 'completedKatas', populate: { path: 'id', select: 'name rank.name completedLanguages completedAt' } }).sort({ honor: -1 });
   res.status(200).json({ data: users });
 });
 routes.get('/collections', async (_req, res) => {

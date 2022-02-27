@@ -1,4 +1,4 @@
-import { SiJavascript, SiPython } from 'react-icons/si';
+import { SiJavascript, SiPython, SiTypescript } from 'react-icons/si';
 import { AiOutlineConsoleSql } from 'react-icons/ai';
 
 const iconPicker = (name:string) => {
@@ -9,6 +9,8 @@ const iconPicker = (name:string) => {
             return <AiOutlineConsoleSql title='SQL'/>
         case 'python':
             return <SiPython title='Python'/>
+        case 'typescript':
+            return <SiTypescript title='TypeScript'/>
     }
 }
 

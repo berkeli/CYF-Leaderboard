@@ -21,11 +21,24 @@ export class ranks {
     overall!: rank;
     languages!: languageRanks[];
 }
+
 export class collectionProgress{
     id!: string;
     completed!: number
     total!:number;
     completeDate!: string;
+}
+
+export class weeklyProgress {
+    date!: string;
+    '-8'!: number;
+    '-7'!: number;
+    '-6'!: number;
+    '-5'!: number;
+    '-4'!: number;   
+    '-3'!: number;    
+    '-2'!: number; 
+    '-1'!: number;
 }
 
 export class UserClass {
@@ -39,4 +52,5 @@ export class UserClass {
     collectionProgress!: collectionProgress[];
     codewarsUsername!: string; 
     honor!:number;
+    weeklyProgress!: weeklyProgress[];
 }

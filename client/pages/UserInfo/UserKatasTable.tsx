@@ -1,4 +1,4 @@
-import { Table, Tbody, Td, Tfoot, Thead, Tr } from '@chakra-ui/react'
+import { Center, Table, Tbody, Td, Tfoot, Thead, Tr } from '@chakra-ui/react'
 import dayjs from 'dayjs';
 import React from 'react'
 import { completedKatas } from '../../entities/';
@@ -15,19 +15,19 @@ export default function UserKatasTable({ completedKatas } : IAuthCollectionsTabl
         <Table w='100%' size='sm' variant='simple'>
             <Thead>
                 <Tr>
-                    <Td>Kata Name</Td>
+                    <Td maxW='60ch'>Kata Name</Td>
                     <Td>Rank</Td>
-                    <Td>Languages</Td>
-                    <Td>Complete Date</Td>
+                    <Td><Center>Languages</Center></Td>
+                    <Td isNumeric>Complete Date</Td>
                 </Tr>
             </Thead>
             <Tbody>
                 {completedKatas.map(el => (
                     <Tr key={el.id._id}>
-                        <Td>{el.id.name}</Td>
+                        <Td isTruncated maxW={{base: '40ch', lg: '25ch', xl: '50ch'}}>{el.id.name}</Td>
                         <Td><span className=''>{el.id.rank.name}</span></Td>
-                        <Td>{el.completedLanguages.map(e => iconPicker(e))}</Td>
-                        <Td>{dayjs(el.completedAt).format('DD MMM YYYY')}</Td>
+                        <Td><Center>{el.completedLanguages.map(e => iconPicker(e))}</Center></Td>
+                        <Td isNumeric minW='min-content'>{dayjs(el.completedAt).format('DD MMM YYYY')}</Td>
                     </Tr>
                 ))}
             </Tbody>

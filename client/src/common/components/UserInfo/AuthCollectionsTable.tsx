@@ -1,7 +1,7 @@
 import { Table, Tbody, Td, Tfoot, Thead, Tr } from '@chakra-ui/react'
 import React from 'react'
-import { AuthoredCollection } from '../../entities/authoredCollections';
-import { collectionProgress } from '../../entities/user';
+import { AuthoredCollection } from '../../../entities/authoredCollections';
+import { collectionProgress } from '../../../entities/user';
 import dayjs from 'dayjs';
 
 interface IAuthCollectionsTable {

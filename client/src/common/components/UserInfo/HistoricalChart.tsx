@@ -1,8 +1,8 @@
 import { Container } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { weeklyProgress } from '../../entities/user';
-import RANKS from '../../common/const';
+import { weeklyProgress } from '../../../entities/user';
+import RANKS from '../../const';
 
 interface IHistoricalChart {
     data: weeklyProgress[]

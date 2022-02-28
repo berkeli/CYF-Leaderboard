@@ -1,5 +1,5 @@
 import { Box, Center, Heading, Table, Tbody, Td, Tfoot, Th, Thead, Tr, VStack, Wrap, WrapItem } from "@chakra-ui/react";
-import { UserClass, AuthoredCollection } from "../../entities";
+import { UserClass, AuthoredCollection } from "../../../entities";
 import AuthCollectionsTable from "./AuthCollectionsTable";
 import HistoricalChart from "./HistoricalChart";
 import UserKatasTable from "./UserKatasTable";

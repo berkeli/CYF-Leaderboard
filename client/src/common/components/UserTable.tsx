@@ -15,7 +15,7 @@ import { AuthoredCollection } from '../../entities';
 import { UserClass } from '../../entities/user';
 import { spinnerJSX } from '../utils';
 import config from '../config';
-import UserInfo from '../../pages/_UserInfo';
+import UserInfo from './UserInfo';
 
 interface UserTableState {
     users: UserClass[],

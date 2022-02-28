@@ -1,9 +1,9 @@
 import { Center, Table, Tbody, Td, Tfoot, Thead, Tr } from '@chakra-ui/react'
 import dayjs from 'dayjs';
 import React from 'react'
-import { completedKatas } from '../../entities/';
+import { completedKatas } from '../../entities';
 import { FaJava } from 'react-icons/fa';
-import iconPicker from '../components/icons';
+import iconPicker from '../../common/components/icons';
 
 interface IAuthCollectionsTable {
     completedKatas: completedKatas[],

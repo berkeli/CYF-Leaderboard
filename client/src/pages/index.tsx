@@ -1,9 +1,9 @@
 import { Box, Center } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 
-import Background from './components/Background'
-import Navigation from './components/Navigation'
-import UserTable from './components/UserTable'
+import Background from '../common/components/Background'
+import Navigation from '../common/components/Navigation'
+import UserTable from '../common/components/UserTable'
 
 const Home: NextPage = () => {
    return (

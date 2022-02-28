@@ -13,9 +13,9 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { AuthoredCollection } from '../../entities';
 import { UserClass } from '../../entities/user';
-import { spinnerJSX } from '../../common/utils';
-import config from '../../common/config';
-import UserInfo from '../UserInfo';
+import { spinnerJSX } from '../utils';
+import config from '../config';
+import UserInfo from '../../pages/_UserInfo';
 
 interface UserTableState {
     users: UserClass[],

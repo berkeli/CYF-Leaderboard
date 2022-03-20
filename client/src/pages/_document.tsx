@@ -1,15 +1,13 @@
 
 import { ColorModeScript } from '@chakra-ui/react'
-import NextDocument, { Html, Head, Main, NextScript } from 'next/document'
-import { extendTheme, ThemeConfig } from "@chakra-ui/react"
+import { Html, Head, Main, NextScript} from 'next/document'
 import theme from '../common/theme'
 
-
-export default class Document extends NextDocument {
-  render() {
-    return (
+const Document = () => {
+  return (
       <Html lang='en'>
-        <Head />
+        <Head title="CYF Leaderboard">
+        </Head>
         <body>
           <ColorModeScript initialColorMode={theme.config.initialColorMode} />
           <Main />
@@ -17,5 +15,6 @@ export default class Document extends NextDocument {
         </body>
       </Html>
     )
-  }
 }
+
+export default Document

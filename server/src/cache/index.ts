@@ -12,18 +12,18 @@ const textMatch = (a:string, b:string):boolean => a?.toLowerCase().includes(b.to
 
 export const getUsersFromCache = async ({q, page, perPage, clan}: getUsersFromCache) => {
     if (q) {
-        const clanMembers = await redis.LRANGE(clan, 0, -1);
+        const clanMembers = await redis.LRANGE(clan, 0, -1).catch((err:Error) => console.error(err.message));
         const data = clanMembers.map((e:string)=> JSON.parse(e)).filter((e:any)=> textMatch(e.name, q) || textMatch(e.codewarsUsername, q))
         return {
             data,
             total: data.length
         }
     }
-    const clanMembers = await redis.LRANGE(clan, page * perPage, (page + 1) * perPage-1);
+    const clanMembers = await redis.LRANGE(clan, page * perPage, (page + 1) * perPage-1).catch((err:Error) => console.error(err.message));;
     if (clanMembers.length === 0) {
         await redis.DEL(clan);
         const users = await User.find({clan}).populate({ path: 'completedKatas', populate: { path: 'id', select: 'name rank.name completedLanguages completedAt' } }).sort({ honor: -1 });
-        await redis.RPUSH(clan, users.map(e => JSON.stringify(e)), 'EX', 60 * 60 * 24);
+        await redis.RPUSH(clan, users.map(e => JSON.stringify(e)), 'EX', 60 * 60 * 24).catch((err:Error) => console.error(err.message));;
         return {
             data: users.splice(page * perPage, perPage),
             total: users.length

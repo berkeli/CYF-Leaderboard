@@ -10,12 +10,14 @@ export default async (username:string):Promise<{_id: mongoose.Types.ObjectId, cr
   const URL = `https://www.codewars.com/users/${username}/authored_collections`
   const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
   const page = await browser.newPage();
+  await page.setDefaultNavigationTimeout(0);
   await page.goto(URL);
   await page.setViewport({ width: 1200,
     height: 800 });
-
+  
   await autoScroll(page);
   const $ = cheerio.load(await page.content());
+  await browser.close();
   const elmSelector = '.list-item-collection'
 
   const collections:AuthoredCollection[] = []
@@ -33,7 +35,5 @@ export default async (username:string):Promise<{_id: mongoose.Types.ObjectId, cr
       collections.push({ _id: new mongoose.Types.ObjectId(e.attribs.id), name: e.attribs['data-title'], createdByName: username, createdBy: userId });
     }
   })
-
-  await browser.close();
   return collections
 };

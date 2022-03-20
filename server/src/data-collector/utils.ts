@@ -16,7 +16,7 @@ export async function autoScroll(page: puppeteer.Page) {
           clearInterval(timer);
           resolve(null);
         }
-      }, 100);
+      }, 200);
     });
   });
 }

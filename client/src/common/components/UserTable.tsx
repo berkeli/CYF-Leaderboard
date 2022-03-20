@@ -63,7 +63,6 @@ export default function UserTable() {
                 method: 'GET',
                 url: `${config.APIURL}collections`
             }).then((res)=>{
-                console.log(res.data.data)
                 setState({...state, authCollections: res.data.data, expanded: ID})
             }).catch((e) => {
                 if (e) console.log(e.message);
@@ -87,22 +86,35 @@ export default function UserTable() {
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {state.users.map((user, id)=>(
-                            [<Tr key={user._id} cursor='pointer' role='group' onClick={() => toggleRow(user._id)}>
-                                <Td _groupHover={{background: bgHover}} _hover={{background: bgHover}} w={'1'}>{id+1}</Td>
-                                <Td _groupHover={{background: bgHover}} _hover={{background: bgHover}} >{user.name ? user.name : user.codewarsUsername}</Td>
-                                <Td _groupHover={{background: bgHover}} _hover={{background: bgHover}}  display={{base: 'none', md: 'table-cell'}} isNumeric>{user.completedKatas.length}</Td>
-                                <Td _groupHover={{background: bgHover}} _hover={{background: bgHover}}  display={{base: 'none', md: 'table-cell'}}>{user.ranks.overall.name}</Td>
-                                <Td _groupHover={{background: bgHover}} _hover={{background: bgHover}}  isNumeric>{user.honor}</Td>
-                                <Td _groupHover={{background: bgHover}} _hover={{background: bgHover}}  isNumeric>{Math.round(user.collectionProgress.reduce((tc : number,{completed}) => tc + completed, 0) / user.collectionProgress.reduce((tc,{total}) => tc + total, 0) * 10000)/100 }%</Td>
-                            </Tr>,
-                            user._id === state.expanded ? <UserInfo user={user} collections={state.authCollections}/> : null]
-                            
-                    ))}
+                    {state.users.map((user, id)=> <UserRow key={id} id={id} user={user} expanded={state.expanded} toggleRow={toggleRow} authCollections={state.authCollections} bgHover={bgHover}/>)}
                 </Tbody>
                 
             </Table>
             { state.loading ? spinnerJSX : null}
         </Box>
         );
+}
+
+interface IUserRow {
+    user: UserClass;
+    expanded: string;
+    toggleRow: (id: string) => void;
+    authCollections: AuthoredCollection[];
+    bgHover: any;
+    id: number;
+}
+
+const UserRow: React.FC<IUserRow> = ({user, expanded, toggleRow, authCollections, bgHover, id} : IUserRow) => {
+    const progress = Math.round(user.collectionProgress.reduce((tc : number,{completed}) => tc + completed, 0) / user.collectionProgress.reduce((tc,{total}) => tc + total, 0) * 10000)/100
+    return(<>
+        <Tr key='0' cursor='pointer' role='group' onClick={() => toggleRow(user._id)}>
+            <Td _groupHover={{background: bgHover}} _hover={{background: bgHover}} w={'1'}>{id+1}</Td>
+            <Td _groupHover={{background: bgHover}} _hover={{background: bgHover}} >{user.name ? user.name : user.codewarsUsername}</Td>
+            <Td _groupHover={{background: bgHover}} _hover={{background: bgHover}}  display={{base: 'none', md: 'table-cell'}} isNumeric>{user.completedKatas.length}</Td>
+            <Td _groupHover={{background: bgHover}} _hover={{background: bgHover}}  display={{base: 'none', md: 'table-cell'}}>{user.ranks.overall.name}</Td>
+            <Td _groupHover={{background: bgHover}} _hover={{background: bgHover}}  isNumeric>{user.honor}</Td>
+            <Td _groupHover={{background: bgHover}} _hover={{background: bgHover}}  isNumeric>{progress && `${progress}%`}</Td>
+        </Tr>
+        {user._id === expanded && <UserInfo user={user} collections={authCollections}/>}
+    </>)
 }

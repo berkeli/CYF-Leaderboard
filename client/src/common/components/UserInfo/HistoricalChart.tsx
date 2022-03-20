@@ -12,7 +12,7 @@ const HistoricalChart: React.FC<IHistoricalChart> = ({ data }) => {
   let lines:string[] = [];
   data.forEach(e=>{
       Object.keys(e).forEach((key:string) => {
-          if (key !== 'date' && !lines.includes(key)) {
+          if (key !== 'date' && !lines.includes(key) && key !== 'null') {
               lines.push(key)
             };
         });
@@ -36,7 +36,7 @@ const HistoricalChart: React.FC<IHistoricalChart> = ({ data }) => {
           <YAxis />
           <Tooltip />
           <Legend />
-          {lines.sort().map((e)=> <Line key={e} connectNulls type="monotone" dataKey={e} stroke={RANKS[e].color} name={RANKS[e].name}/>)}
+          {lines.sort().map((e)=> <Line key={e} connectNulls type="monotone" dataKey={e} stroke={RANKS[e].color } name={RANKS[e].name}/>)}
         </LineChart>
     </ResponsiveContainer>
     </Container>

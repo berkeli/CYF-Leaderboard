@@ -30,10 +30,11 @@ export default async (username:string):Promise<UserClass> => {
   let totalPages = 0;
   do {
     const completeKatasReq = await axios(`https://www.codewars.com/api/v1/users/${username}/code-challenges/completed?page=${currentPage}`).catch(err =>{
-      throw new Error(err)
+      console.log(err.message);
     });
+    if (!completeKatasReq) continue;
     userData.completedKatas.push(...completeKatasReq.data.data);
-    totalPages = completeKatasReq.data.TotalPages - 1;
+    totalPages = completeKatasReq.data.totalPages;
     currentPage++;
   } while (totalPages > currentPage)
 

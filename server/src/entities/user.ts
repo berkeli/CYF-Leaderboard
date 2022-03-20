@@ -89,7 +89,7 @@ function isKata(kata: KataClass | undefined | mongoose.Types.ObjectId):kata is K
       dateComplete = new Date(latestComplete);
     }
     delete userData.__v
-    collectionProgress.push({ id: _id, completed, total: katas?.length, dateComplete: dateComplete?.toString() })
+    collectionProgress.push({ id: _id, completed: completed || 0, total: katas.length, dateComplete: dateComplete?.toString() })
   })
   userData.collectionProgress = collectionProgress;
   await userData.save();

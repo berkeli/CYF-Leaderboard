@@ -12,7 +12,7 @@ export default function UserInfo({user, collections} : {user:UserClass, collecti
             <Wrap w='100%' spacing='30px' justify='space-around'>
                 <WrapItem w={{base: '100%', lg: '45%'}}>
                     <VStack w='100%'>
-                        <Heading as='h3' size='md'>CodeYourFuture Authored Collections Progress:</Heading>
+                        <Heading as='h3' size='md'>Authored Collections Progress:</Heading>
                         <AuthCollectionsTable collectionProgress = {user.collectionProgress} collections={collections}/>
                     </VStack>                    
                 </WrapItem>

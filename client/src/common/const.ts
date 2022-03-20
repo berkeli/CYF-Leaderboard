@@ -35,6 +35,18 @@ const RANKS:{
     '-1': {
         name: '1 kyu',
         color: '#927bcc'
+    },    
+    '1': {
+        name: '1 kyu',
+        color: '#927bcc'
+    },    
+    '2': {
+        name: '1 kyu',
+        color: '#927bcc'
+    },    
+    '3': {
+        name: '1 kyu',
+        color: '#927bcc'
     },
 }
 

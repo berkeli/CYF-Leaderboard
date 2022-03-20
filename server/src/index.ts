@@ -6,6 +6,7 @@ import cron from 'node-cron';
 import connect from './utils/connect';
 import updateData from './utils/updateData';
 import routes from './routes';
+import redis from './utils/redis';
 
 cron.schedule('0 0 0 * * *', () => {
   console.log('Daily cron job started')
@@ -13,7 +14,9 @@ cron.schedule('0 0 0 * * *', () => {
 })
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  exposedHeaders: ['total']
+}));
 app.use('/', routes);
 
 const main = async () => {
@@ -22,6 +25,7 @@ const main = async () => {
     console.log(`Server started on Port ${port}`);
   });
   await connect();
-  updateData();
+  await redis.connect();
+  // updateData();
 }
 main();

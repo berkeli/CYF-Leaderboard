@@ -10,7 +10,7 @@ import {
     useColorModeValue,
 } from '@chakra-ui/react'
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AuthoredCollection } from '../../entities';
 import { UserClass } from '../../entities/user';
 import { spinnerJSX } from '../utils';
@@ -24,7 +24,8 @@ interface UserTableState {
     loading: boolean,
     hasMore: boolean,
     expanded: string,
-    authCollections: AuthoredCollection[]
+    authCollections: AuthoredCollection[],
+    total: number
 }
 
 export default function UserTable() {
@@ -39,17 +40,33 @@ export default function UserTable() {
         loading: true,
         hasMore: false,
         expanded: '',
+        total: 0,
     });
+    const observer = useRef<IntersectionObserver>()
+    const lastItemRef = useCallback((node) => {
+        if (state.loading) return
+        if (observer.current) observer.current.disconnect();
+
+        observer.current = new IntersectionObserver(entries => { 
+          if (entries[0].isIntersecting && state.users.length < state.total) {
+            setState({...state, pageNumber: state.pageNumber + 1})
+          }
+        })
+    
+        if (node) observer.current.observe(node) 
+      }, [state.loading, state.users, state.total])
+
     useEffect(()=>{
         setState({...state, loading: true});
         let cancel:()=>void;
         axios({
             method: 'GET',
             url: `${config.APIURL}users`,
-            params: {q: state.query, page: state.pageNumber},
+            params: {q: state.query, page: state.pageNumber, perPage: 10, clan: 'CodeYourFuture'},
             cancelToken: new axios.CancelToken(c => cancel = c)
         }).then((res)=>{
-            setState({...state, users: [...state.users, ...res.data.data], loading: false})
+            console.log(res.headers)
+            setState({...state, users: [...state.users, ...res.data.data], loading: false, total: parseInt(res.headers.total)})
         }).catch((e) => {
             if (axios.isCancel(e)) return
         })
@@ -86,11 +103,11 @@ export default function UserTable() {
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {state.users.map((user, id)=> <UserRow key={id} id={id} user={user} expanded={state.expanded} toggleRow={toggleRow} authCollections={state.authCollections} bgHover={bgHover}/>)}
+                    {state.users.map((user, id)=> <UserRow forwardRef={id === state.users.length - 1 ? lastItemRef : null} key={id} id={id} user={user} expanded={state.expanded} toggleRow={toggleRow} authCollections={state.authCollections} bgHover={bgHover}/>)}
                 </Tbody>
                 
             </Table>
-            { state.loading ? spinnerJSX : null}
+            { state.loading && spinnerJSX }
         </Box>
         );
 }
@@ -102,12 +119,13 @@ interface IUserRow {
     authCollections: AuthoredCollection[];
     bgHover: any;
     id: number;
+    forwardRef: any
 }
 
-const UserRow: React.FC<IUserRow> = ({user, expanded, toggleRow, authCollections, bgHover, id} : IUserRow) => {
+const UserRow: React.FC<IUserRow> = ({user, expanded, toggleRow, authCollections, bgHover, id, forwardRef} : IUserRow) => {
     const progress = Math.round(user.collectionProgress.reduce((tc : number,{completed}) => tc + completed, 0) / user.collectionProgress.reduce((tc,{total}) => tc + total, 0) * 10000)/100
     return(<>
-        <Tr key='0' cursor='pointer' role='group' onClick={() => toggleRow(user._id)}>
+        <Tr ref={forwardRef} key='0' cursor='pointer' role='group' onClick={() => toggleRow(user._id)}>
             <Td _groupHover={{background: bgHover}} _hover={{background: bgHover}} w={'1'}>{id+1}</Td>
             <Td _groupHover={{background: bgHover}} _hover={{background: bgHover}} >{user.name ? user.name : user.codewarsUsername}</Td>
             <Td _groupHover={{background: bgHover}} _hover={{background: bgHover}}  display={{base: 'none', md: 'table-cell'}} isNumeric>{user.completedKatas.length}</Td>

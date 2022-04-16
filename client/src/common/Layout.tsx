@@ -1,5 +1,5 @@
 import { Box } from '@chakra-ui/react'
-import React from 'react'
+import React, { useState } from 'react'
 import Background from './components/Background'
 import Navigation from './components/Navigation'
 
@@ -8,11 +8,13 @@ type Props = {
 }
 
 export default function Layout({children}: Props) {
+  const [animationOn, setAnimationOn] = useState<boolean>(false);
+  const toggleAnimation = () => setAnimationOn(!animationOn);
   return (
     <Box>
-       <Navigation/>
-       <Background />
-       <Box px={'5rem'} minH={'100vh'} pt={'3rem'}>
+       <Navigation animationOn={animationOn} toggleAnimation={toggleAnimation}/>
+       <Background animationOn={animationOn}/>
+       <Box px={'5rem'} minH={'100vh'} py={'3rem'}>
          {children}
        </Box>
      </Box>

@@ -20,7 +20,7 @@ export default function AuthCollectionsTable({ collectionProgress, collections }
         <Table w='100%' size='sm' variant='simple'>
             <Thead>
                 <Tr>
-                    <Td maxW={{base: '40ch', lg: '25ch', xl:'35ch'}}>Collection</Td>
+                    <Td w={{base: '40ch', lg: '25ch', xl:'35ch'}}>Collection</Td>
                     <Td>Completed</Td>
                     <Td>Progress</Td>
                     <Td style={{whiteSpace: 'nowrap'}}>Date</Td>
@@ -29,7 +29,7 @@ export default function AuthCollectionsTable({ collectionProgress, collections }
             <Tbody>
                 {collections.map(el => (
                     <Tr key={el._id}>
-                        <Td isTruncated noOfLines={1} maxW={{base: '40ch', lg: '25ch', xl:'35ch'}}>{el.name}</Td>
+                        <Td isTruncated noOfLines={1} w={{base: '40ch', lg: '25ch', xl:'35ch'}}>{el.name}</Td>
                         <Td>{collById[el._id]?.completed || 0}/{el.katas.length}</Td>
                         <Td>{collById[el._id]?.completed ? Math.round(collById[el._id]?.completed / el.katas.length * 10000) / 100 : 0}%</Td>
                         <Td style={{whiteSpace: 'nowrap'}}>{collById[el._id]?.dateComplete ? dayjs(collById[el._id].dateComplete).format('DD MMM YYYY') : ''}</Td>

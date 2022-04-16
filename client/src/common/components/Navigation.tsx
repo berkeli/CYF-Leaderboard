@@ -25,7 +25,12 @@ const NavLink = ({ children, url }: { children: ReactNode, url:string }) => (
     </Link>
 );
 
-export default function Navigation() {
+type Props = {
+    animationOn: boolean,
+    toggleAnimation: () => void,
+}
+
+export default function Navigation({animationOn, toggleAnimation}: Props) {
     const { colorMode, toggleColorMode } = useColorMode();
     const Links = [
         {title: 'Authored Collections', url: '/authored-collections'},
@@ -45,9 +50,14 @@ export default function Navigation() {
                         ))}
                     </HStack>
                 </HStack>
-            <Button onClick={toggleColorMode}>
-                {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-            </Button>
+            <Box>
+                <Button onClick={toggleAnimation} mr='4'>
+                    {!animationOn ? 'Animations On' : 'Animations Off'}
+                </Button>
+                <Button onClick={toggleColorMode}>
+                    {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+                </Button>
+            </Box>
             </Flex>            
         </Box>
 

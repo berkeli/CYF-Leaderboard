@@ -13,6 +13,8 @@
 .animatedText {
     position: relative;
     transform: skewY(345deg) translateY(-250px);
+}
+.animatedText.on {
     animation: animateColor 5s linear infinite alternate;
 }
 @keyframes animateColor {
@@ -30,7 +32,9 @@
     color:white;
     pointer-events: none;
     line-height: 1em;
-    white-space: nowrap;    
+    white-space: nowrap;        
+}
+.animatedText.on h2 {
     animation: animateX 30s linear infinite alternate;
 }
 

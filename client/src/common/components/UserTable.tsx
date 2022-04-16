@@ -19,28 +19,31 @@ import UserInfo from './UserInfo';
 
 interface UserTableState {
     users: UserClass[],
-    query: string, 
     pageNumber: number, 
     loading: boolean,
     hasMore: boolean,
     expanded: string,
     authCollections: AuthoredCollection[],
-    total: number
+    total: number,
+    forceSearch: boolean,
 }
+type Props = {
+    query: string;
+};
 
-export default function UserTable() {
+export default function UserTable({ query }:Props) {
     const bg = useColorModeValue('white', 'gray.800');
     const bgHover = useColorModeValue('gray.400', 'teal.400');
 
     const [state, setState] = useState<UserTableState>({
         users: [],
         authCollections: [],
-        query: '',
         pageNumber: 0,
         loading: true,
         hasMore: false,
         expanded: '',
         total: 0,
+        forceSearch: false
     });
     const observer = useRef<IntersectionObserver>()
     const lastItemRef = useCallback((node) => {
@@ -56,22 +59,26 @@ export default function UserTable() {
         if (node) observer.current.observe(node) 
       }, [state.loading, state.users, state.total])
 
-    useEffect(()=>{
-        setState({...state, loading: true});
-        let cancel:()=>void;
+    const getUsers = async () => {
         axios({
             method: 'GET',
             url: `${config.APIURL}users`,
-            params: {q: state.query, page: state.pageNumber, perPage: 10, clan: 'CodeYourFuture'},
-            cancelToken: new axios.CancelToken(c => cancel = c)
+            params: {q: query, page: state.pageNumber, perPage: 10, clan: 'CodeYourFuture'},
         }).then((res)=>{
-            console.log(res.headers)
             setState({...state, users: [...state.users, ...res.data.data], loading: false, total: parseInt(res.headers.total)})
         }).catch((e) => {
-            if (axios.isCancel(e)) return
+            throw new Error('Something went wrong: ', e.message)
         })
-        return ()=> cancel()
-    }, [state.query, state.pageNumber])
+    }
+
+    useEffect(() => {
+        setState({...state, pageNumber: 0, users: [], forceSearch: !state.forceSearch})
+    } , [query])
+
+    useEffect(()=>{
+        setState({...state, loading: true});
+        getUsers();
+    }, [state.pageNumber, state.forceSearch])
 
     const toggleRow = (userID:string) => {
         const ID = userID === state.expanded ? '' : userID

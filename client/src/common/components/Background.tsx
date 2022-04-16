@@ -1,7 +1,11 @@
 import { Box, useColorModeValue } from '@chakra-ui/react'
 import React from 'react';
 
-export default function Background() {
+type Props = {
+  animationOn: boolean;
+}
+
+export default function Background({ animationOn }: Props) {
   const color = useColorModeValue('var(--chakra-colors-gray-800)','var(--chakra-colors-gray-200)');
   const shColor = useColorModeValue('rgba(0, 0, 0, 0.1)', 'rgba(255, 255, 255, 0.1)')
   const style = { WebkitTextStroke : `2px ${color}` };
@@ -11,10 +15,9 @@ export default function Background() {
       const setVar = {'--i' : cursorSpeed[i], '--shadow-color' : shColor} as React.CSSProperties;
       return (<h2 key={i} style={setVar}>{row}</h2>)
   })
-
   return (
-    <Box className="animatedBackground">
-      <div className='animatedText'>
+    <Box className='animatedBackground'>
+      <div className={`animatedText ${animationOn && 'on'}`}>
         {textBox}
       </div>      
     </Box>);

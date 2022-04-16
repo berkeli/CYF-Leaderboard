@@ -24,8 +24,11 @@ const main = async () => {
   app.listen(port, () => {
     console.log(`Server started on Port ${port}`);
   });
+
   await connect();
+
   await redis.connect();
-  // updateData();
+
+  updateData();
 }
 main();

@@ -10,6 +10,7 @@ interface TypedRequestQuery<T extends Query> extends Express.Request {
 }
 
 routes.get('/users', async (req:TypedRequestQuery<{q?: string; page: string; perPage: string; clan: string;}>, res) => {
+  console.log(req.query)
   const {q, page, perPage, clan} = req.query;
   const data = await getUsersFromCache({q, page: parseInt(page), perPage: parseInt(perPage), clan})
   res.set('total', data.total);
@@ -19,4 +20,5 @@ routes.get('/collections', async (_req, res) => {
   const colls = await AuthoredCollection.find().sort({ order: 1 });
   res.status(200).json({ data: colls });
 });
+
 export default routes;

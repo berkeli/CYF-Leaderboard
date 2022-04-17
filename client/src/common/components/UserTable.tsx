@@ -67,7 +67,7 @@ export default function UserTable({ query }:Props) {
         }).then((res)=>{
             setState({...state, users: [...state.users, ...res.data.data], loading: false, total: parseInt(res.headers.total)})
         }).catch((e) => {
-            throw new Error('Something went wrong: ', e.message)
+            throw new Error('Something went wrong: ' + e.message)
         })
     }
 
